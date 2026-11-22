@@ -1617,7 +1617,7 @@ fn default_launch_options() -> LaunchOptions {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum DesktopRoute {
     CodexDesktop,
     App,
@@ -1631,6 +1631,17 @@ fn desktop_route(
     codex_installed: bool,
     shell_available: bool,
 ) -> DesktopRoute {
+    #[cfg(target_os = "windows")]
+    if let Some(prefs) = preferences
+        .as_ref()
+        .filter(|prefs| prefs.onboarding_completed)
+    {
+        return match prefs.default_desktop_surface {
+            Surface::NativeShell => DesktopRoute::App,
+            Surface::CodexDesktop if codex_installed => DesktopRoute::CodexDesktop,
+            Surface::CodexDesktop => DesktopRoute::CodexUnavailable,
+        };
+    }
     if shell_available {
         return DesktopRoute::Onboarding;
     }
@@ -1949,6 +1960,17 @@ mod tests {
         let native = Some(Preferences::new(Surface::NativeShell, true));
         let codex = Some(Preferences::new(Surface::CodexDesktop, true));
         let incomplete = Some(Preferences::new(Surface::CodexDesktop, false));
+        let native_with_shell = if cfg!(windows) { App } else { Onboarding };
+        let codex_installed_with_shell = if cfg!(windows) {
+            CodexDesktop
+        } else {
+            Onboarding
+        };
+        let codex_missing_with_shell = if cfg!(windows) {
+            CodexUnavailable
+        } else {
+            Onboarding
+        };
         for (prefs, installed, shell, expected) in [
             (None, false, true, Onboarding),
             (None, false, false, RememberNative),
@@ -1956,11 +1978,12 @@ mod tests {
             (None, true, false, CodexDesktop),
             (incomplete, false, true, Onboarding),
             (incomplete, true, true, Onboarding),
-            (native, true, true, Onboarding),
+            (native, true, true, native_with_shell),
             (native, true, false, App),
-            (codex, true, true, Onboarding),
+            (native, false, true, native_with_shell),
+            (codex, true, true, codex_installed_with_shell),
             (codex, true, false, CodexDesktop),
-            (codex, false, true, Onboarding),
+            (codex, false, true, codex_missing_with_shell),
             (codex, false, false, CodexUnavailable),
         ] {
             assert_eq!(desktop_route(prefs, installed, shell), expected);

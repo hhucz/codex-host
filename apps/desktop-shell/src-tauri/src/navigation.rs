@@ -63,11 +63,27 @@ window.__CODEXHOST_DESKTOP_SHELL__ = true;
   if (window.top !== window) return;
   const isWindows = {is_windows};
   const isMacos = {is_macos};
+  const invoke = (name, args) => window.__TAURI_INTERNALS__?.invoke?.(name, args);
+
+  const installBridge = () => {{
+    if (location.protocol + "//" + location.host === {APP_ORIGIN:?} &&
+        [{ONBOARDING:?}, {LOADING:?}].includes(location.pathname)) {{
+      window.__codexhostShell = Object.freeze({{
+        chooseSurface: (surface) => invoke("choose_surface", {{ surface }}),
+        retry: () => invoke("retry"),
+        openConsole: () => invoke("open_console"),
+        getState: () => invoke("get_state"),
+        ensureWebAccess: () => invoke("ensure_web_access"),
+        openWebBrowser: () => invoke("open_web_browser"),
+      }});
+    }}
+  }};
+
+  // WebView2 can run initialization scripts before <html> exists.
+  const initializeDocument = () => {{
   const root = document.documentElement;
   root.setAttribute("data-codexhost-shell", "");
   root.setAttribute("data-tauri-shell", "");
-
-  const invoke = (name, args) => window.__TAURI_INTERNALS__?.invoke?.(name, args);
 
   if (isWindows) {{
     root.setAttribute("data-windows-titlebar", "");
@@ -267,16 +283,20 @@ window.__CODEXHOST_DESKTOP_SHELL__ = true;
     }}
   }}
 
-  if (location.protocol + "//" + location.host !== {APP_ORIGIN:?} ||
-      ![{ONBOARDING:?}, {LOADING:?}].includes(location.pathname)) return;
-  window.__codexhostShell = Object.freeze({{
-    chooseSurface: (surface) => invoke("choose_surface", {{ surface }}),
-    retry: () => invoke("retry"),
-    openConsole: () => invoke("open_console"),
-    getState: () => invoke("get_state"),
-    ensureWebAccess: () => invoke("ensure_web_access"),
-    openWebBrowser: () => invoke("open_web_browser"),
-  }});
+  }};
+
+  if (isWindows) {{
+    installBridge();
+    // WebView2 can run initialization scripts before <html> exists.
+    if (document.documentElement) {{
+      initializeDocument();
+    }} else {{
+      document.addEventListener("DOMContentLoaded", initializeDocument, {{ once: true }});
+    }}
+  }} else {{
+    initializeDocument();
+    installBridge();
+  }}
 }})();
 "##,
     )
@@ -325,5 +345,55 @@ mod tests {
             assert_eq!(classify(&url, Some(&web)), expected, "{}", url.path());
         }
         assert_eq!(classify(&web, None), Navigation::Browser);
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn installs_bridge_before_document_element_is_available() {
+        use std::io::Write;
+        use std::process::{Command, Stdio};
+
+        let source = format!(
+            r#"
+globalThis.window = globalThis;
+window.top = window;
+window.addEventListener = () => {{}};
+window.__TAURI_INTERNALS__ = {{ invoke: () => Promise.resolve({{}}) }};
+globalThis.location = {{
+  protocol: "http:",
+  host: "tauri.localhost",
+  pathname: "/onboarding.html",
+}};
+globalThis.document = {{
+  documentElement: null,
+  readyState: "loading",
+  addEventListener: () => {{}},
+}};
+{}
+if (typeof window.__codexhostShell?.chooseSurface !== "function") {{
+  throw new Error("native bridge was not installed");
+}}
+"#,
+            initialization_script()
+        );
+        let mut child = Command::new("node")
+            .arg("-")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::null())
+            .stderr(Stdio::piped())
+            .spawn()
+            .expect("Node.js is required for the desktop shell initialization test");
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(source.as_bytes())
+            .unwrap();
+        let output = child.wait_with_output().unwrap();
+        assert!(
+            output.status.success(),
+            "initialization failed before the document element existed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
     }
 }

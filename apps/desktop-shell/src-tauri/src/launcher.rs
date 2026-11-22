@@ -109,7 +109,7 @@ fn find_launcher(shell: &Path, override_path: Option<PathBuf>) -> Option<PathBuf
         .find(|path| path.is_absolute() && path.is_file() && !is_same_executable(path, shell))
 }
 
-#[derive(Clone, Copy, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub(crate) enum Surface {
     NativeShell,
@@ -120,6 +120,11 @@ pub(crate) enum Surface {
 #[serde(rename_all = "camelCase")]
 struct LaunchPreferences {
     codex_desktop_installed: bool,
+    #[cfg(target_os = "windows")]
+    #[serde(default)]
+    default_desktop_surface: Option<Surface>,
+    #[cfg(target_os = "windows")]
+    onboarding_completed: bool,
 }
 
 pub(crate) struct Launcher {
@@ -267,11 +272,44 @@ impl Launcher {
             .map(|output| String::from_utf8_lossy(&output).trim().to_owned())
     }
 
-    pub fn codex_installed(&self) -> Result<bool, String> {
+    fn launch_preferences(&self) -> Result<LaunchPreferences, String> {
         let output = self.execute(&["launch-prefs", "get", "--json"], true)?;
-        serde_json::from_slice::<LaunchPreferences>(&output)
-            .map(|prefs| prefs.codex_desktop_installed)
+        serde_json::from_slice(&output)
             .map_err(|error| format!("Cannot read CodexHost launch preferences: {error}"))
+    }
+
+    pub fn codex_installed(&self) -> Result<bool, String> {
+        Ok(self.launch_preferences()?.codex_desktop_installed)
+    }
+
+    #[cfg(target_os = "windows")]
+    pub fn default_menu_state(&self) -> Result<(Option<Surface>, bool), String> {
+        let preferences = self.launch_preferences()?;
+        let surface = if preferences.onboarding_completed {
+            preferences.default_desktop_surface
+        } else {
+            None
+        };
+        Ok((surface, preferences.codex_desktop_installed))
+    }
+
+    #[cfg(target_os = "windows")]
+    pub fn toggle_default(&self, surface: Surface) -> Result<(), String> {
+        if self.default_menu_state()?.0 == Some(surface) {
+            self.run(&[
+                "launch-prefs",
+                "set",
+                "--surface",
+                match surface {
+                    Surface::NativeShell => "native-shell",
+                    Surface::CodexDesktop => "codex-desktop",
+                },
+                "--onboarding-completed",
+                "false",
+            ])
+        } else {
+            self.set_surface(surface)
+        }
     }
 
     pub fn open_codex(&self) -> Result<(), String> {

@@ -1,0 +1,235 @@
+{
+  "steps": [
+    {
+      "step": "desktop-create-section",
+      "createdSectionVisible": true,
+      "emptyDropZoneVisible": true
+    },
+    {
+      "step": "desktop-drag-to-empty-section",
+      "sec2Order": [
+        "session:syn-t-3"
+      ]
+    },
+    {
+      "step": "desktop-drag-before-anchor-with-pending",
+      "sprintAfterCross": [
+        "session:syn-t-1",
+        "session:syn-t-4",
+        "session:syn-t-2"
+      ]
+    },
+    {
+      "step": "desktop-intra-section-reorder",
+      "sprintAfterIntra": [
+        "session:syn-t-2",
+        "session:syn-t-1",
+        "session:syn-t-4"
+      ]
+    },
+    {
+      "step": "desktop-drag-back-to-unsectioned",
+      "unsectionedHasT3": true
+    },
+    {
+      "step": "mobile-360-move-up",
+      "mobileInitialOrder": [
+        "session:syn-t-2",
+        "session:syn-t-1",
+        "session:syn-t-4"
+      ],
+      "mobileAfterUp": [
+        "session:syn-t-1",
+        "session:syn-t-2",
+        "session:syn-t-4"
+      ]
+    },
+    {
+      "step": "mobile-360-move-down",
+      "upDisabledAtTop": true,
+      "mobileAfterDown": [
+        "session:syn-t-2",
+        "session:syn-t-1",
+        "session:syn-t-4"
+      ]
+    }
+  ],
+  "rpcLog": [
+    {
+      "step": "desktop-create-section",
+      "method": "codexhost/thread/sections/create",
+      "params": {
+        "name": "QA Queue"
+      },
+      "sectionsAfter": [
+        {
+          "id": "sec-sprint",
+          "name": "Active Sprint",
+          "threadIds": [
+            "syn-t-1",
+            "syn-t-2"
+          ]
+        },
+        {
+          "id": "sec-2",
+          "name": "QA Queue",
+          "threadIds": []
+        }
+      ]
+    },
+    {
+      "step": "desktop-drag-to-empty-section",
+      "method": "codexhost/thread/sections/move",
+      "params": {
+        "threadId": "syn-t-3",
+        "sectionId": "sec-2",
+        "beforeThreadId": null
+      },
+      "sectionsAfter": [
+        {
+          "id": "sec-sprint",
+          "name": "Active Sprint",
+          "threadIds": [
+            "syn-t-1",
+            "syn-t-2"
+          ]
+        },
+        {
+          "id": "sec-2",
+          "name": "QA Queue",
+          "threadIds": [
+            "syn-t-3"
+          ]
+        }
+      ]
+    },
+    {
+      "step": "desktop-drag-before-anchor-with-pending",
+      "method": "codexhost/thread/sections/move",
+      "params": {
+        "threadId": "syn-t-4",
+        "sectionId": "sec-sprint",
+        "beforeThreadId": "syn-t-2"
+      },
+      "sectionsAfter": [
+        {
+          "id": "sec-sprint",
+          "name": "Active Sprint",
+          "threadIds": [
+            "syn-t-1",
+            "syn-t-4",
+            "syn-t-2"
+          ]
+        },
+        {
+          "id": "sec-2",
+          "name": "QA Queue",
+          "threadIds": [
+            "syn-t-3"
+          ]
+        }
+      ]
+    },
+    {
+      "step": "desktop-intra-section-reorder",
+      "method": "codexhost/thread/sections/move",
+      "params": {
+        "threadId": "syn-t-2",
+        "sectionId": "sec-sprint",
+        "beforeThreadId": "syn-t-1"
+      },
+      "sectionsAfter": [
+        {
+          "id": "sec-sprint",
+          "name": "Active Sprint",
+          "threadIds": [
+            "syn-t-2",
+            "syn-t-1",
+            "syn-t-4"
+          ]
+        },
+        {
+          "id": "sec-2",
+          "name": "QA Queue",
+          "threadIds": [
+            "syn-t-3"
+          ]
+        }
+      ]
+    },
+    {
+      "step": "desktop-drag-back-to-unsectioned",
+      "method": "codexhost/thread/sections/move",
+      "params": {
+        "threadId": "syn-t-3",
+        "sectionId": null
+      },
+      "sectionsAfter": [
+        {
+          "id": "sec-sprint",
+          "name": "Active Sprint",
+          "threadIds": [
+            "syn-t-2",
+            "syn-t-1",
+            "syn-t-4"
+          ]
+        },
+        {
+          "id": "sec-2",
+          "name": "QA Queue",
+          "threadIds": []
+        }
+      ]
+    },
+    {
+      "step": "mobile-360-move-up",
+      "method": "codexhost/thread/sections/move",
+      "params": {
+        "threadId": "syn-t-1",
+        "sectionId": "sec-sprint",
+        "beforeThreadId": "syn-t-2"
+      },
+      "sectionsAfter": [
+        {
+          "id": "sec-sprint",
+          "name": "Active Sprint",
+          "threadIds": [
+            "syn-t-1",
+            "syn-t-2",
+            "syn-t-4"
+          ]
+        },
+        {
+          "id": "sec-2",
+          "name": "QA Queue",
+          "threadIds": []
+        }
+      ]
+    },
+    {
+      "step": "mobile-360-move-down",
+      "method": "codexhost/thread/sections/move",
+      "params": {
+        "threadId": "syn-t-1",
+        "sectionId": "sec-sprint",
+        "beforeThreadId": "syn-t-4"
+      },
+      "sectionsAfter": [
+        {
+          "id": "sec-sprint",
+          "name": "Active Sprint",
+          "threadIds": [
+            "syn-t-2",
+            "syn-t-1",
+            "syn-t-4"
+          ]
+        },
+        {
+          "id": "sec-2",
+          "name": "QA Queue",
+          "threadIds": []
+        }
+      ]
+    }
+  ]
+}

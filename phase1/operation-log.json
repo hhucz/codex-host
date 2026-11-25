@@ -1,0 +1,696 @@
+{
+  "verifiedAt": "2026-11-25T09:19:46.971Z",
+  "harnessUsed": [
+    "claude-code",
+    "opencode"
+  ],
+  "codexHarnessUsed": false,
+  "desktopViewport": "1280x900",
+  "mobileViewport": "360x780",
+  "unhandledRpcCounts": {
+    "codexhost/preferences/migrate": 2,
+    "codexhost/extensions/list": 2,
+    "codexhost/extensions/catalog": 2,
+    "codexhost/extensions/snapshot": 8,
+    "codexhost/update/check": 2,
+    "session/create": 9
+  },
+  "entries": [
+    {
+      "timestamp": "2026-11-25T09:19:42.347Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "baseline"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:42.490Z",
+      "kind": "assertion",
+      "detail": {
+        "viewport": "desktop",
+        "check": "menu-order",
+        "session": "sess-alpha-active",
+        "menuItems": [
+          "置顶会话",
+          "移动到项目",
+          "移动到分区",
+          "移回无分区",
+          "在分区中上移",
+          "在分区中下移",
+          "重命名\nCtrl\n+\nAlt\n+\nG",
+          "分叉会话\nCtrl\n+\nShift\n+\nF",
+          "复制会话链接",
+          "归档会话\nCtrl\n+\nAlt\n+\nA"
+        ],
+        "moveProjectIdx": 1,
+        "moveSectionIdx": 2
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:42.634Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase1/01-desktop-menu-order.png",
+        "description": "Desktop session menu with 移动到项目 before 移动到分区"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:42.649Z",
+      "kind": "assertion",
+      "detail": {
+        "viewport": "desktop",
+        "check": "remote-hidden",
+        "remoteMenuItems": [
+          "置顶会话",
+          "重命名\nCtrl\n+\nAlt\n+\nG",
+          "分叉会话\nCtrl\n+\nShift\n+\nF",
+          "归档会话\nCtrl\n+\nAlt\n+\nA"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:42.695Z",
+      "kind": "assertion",
+      "detail": {
+        "viewport": "desktop",
+        "check": "child-agent-hidden",
+        "childMenuItems": [
+          "置顶会话",
+          "移动到分区",
+          "重命名\nCtrl\n+\nAlt\n+\nG",
+          "分叉会话\nCtrl\n+\nShift\n+\nF",
+          "复制会话链接",
+          "归档会话\nCtrl\n+\nAlt\n+\nA"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:42.941Z",
+      "kind": "assertion",
+      "detail": {
+        "viewport": "desktop",
+        "check": "archived-hidden",
+        "archivedMenuItems": [
+          "重命名\nCtrl\n+\nAlt\n+\nG",
+          "分叉会话\nCtrl\n+\nShift\n+\nF",
+          "复制会话链接",
+          "取消归档"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:43.140Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "localProjects",
+        "frame": {
+          "type": "localProjects",
+          "localProjects": [
+            {
+              "id": "proj-alpha",
+              "name": "Project Alpha",
+              "sessionIds": [
+                "sess-alpha-plain",
+                "sess-alpha-mobile",
+                "sess-alpha-active",
+                "sess-alpha-pinned",
+                "sess-alpha-archived"
+              ]
+            },
+            {
+              "id": "proj-beta",
+              "name": "Project Beta",
+              "sessionIds": [
+                "sess-beta-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:43.149Z",
+      "kind": "assertion",
+      "detail": {
+        "viewport": "desktop",
+        "check": "live-target-deleted",
+        "selectedValuePreserved": "proj-gamma",
+        "submitDisabled": true
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:43.431Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase1/02-desktop-dialog-target-deleted.png",
+        "description": "Desktop dialog when selected project is deleted live"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:43.431Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "localProjects",
+        "frame": {
+          "type": "localProjects",
+          "localProjects": [
+            {
+              "id": "proj-alpha",
+              "name": "Project Alpha",
+              "sessionIds": [
+                "sess-alpha-plain",
+                "sess-alpha-mobile",
+                "sess-alpha-active",
+                "sess-alpha-pinned",
+                "sess-alpha-archived"
+              ]
+            },
+            {
+              "id": "proj-beta",
+              "name": "Project Beta",
+              "sessionIds": [
+                "sess-beta-1"
+              ]
+            },
+            {
+              "id": "proj-gamma",
+              "name": "Project Gamma",
+              "sessionIds": [
+                "sess-gamma-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:43.471Z",
+      "kind": "rpc",
+      "detail": {
+        "method": "workspace/moveSessionToProject",
+        "request": {
+          "sessionId": "sess-alpha-plain",
+          "projectId": "proj-beta"
+        },
+        "keys": [
+          "projectId",
+          "sessionId"
+        ],
+        "delayMs": 0,
+        "willFail": true
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:43.504Z",
+      "kind": "assertion",
+      "detail": {
+        "viewport": "desktop",
+        "check": "inline-error-shown",
+        "dialogStillOpen": true
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:43.538Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase1/03-desktop-dialog-error.png",
+        "description": "Desktop dialog inline error banner on RPC failure"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:43.578Z",
+      "kind": "rpc",
+      "detail": {
+        "method": "workspace/moveSessionToProject",
+        "request": {
+          "sessionId": "sess-alpha-plain",
+          "projectId": "proj-beta"
+        },
+        "keys": [
+          "projectId",
+          "sessionId"
+        ],
+        "delayMs": 800,
+        "willFail": false
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:43.585Z",
+      "kind": "assertion",
+      "detail": {
+        "viewport": "desktop",
+        "check": "pending-state-disabled"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:43.626Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase1/04-desktop-dialog-pending.png",
+        "description": "Desktop dialog pending state during in-flight RPC"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.387Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "upsert",
+        "frame": {
+          "type": "upsert",
+          "workspace": {
+            "workspaceId": "ws-alpha",
+            "path": "/synthetic/workspaces/project-alpha",
+            "title": "Project Alpha",
+            "sessionIds": [
+              "sess-alpha-mobile",
+              "sess-alpha-active",
+              "sess-alpha-pinned",
+              "sess-alpha-child",
+              "sess-alpha-archived"
+            ],
+            "createdAt": "2026-11-20T08:00:00.000Z",
+            "updatedAt": "2026-11-25T09:19:43.494Z"
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.387Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "upsert",
+        "frame": {
+          "type": "upsert",
+          "workspace": {
+            "workspaceId": "ws-beta",
+            "path": "/synthetic/workspaces/project-beta",
+            "title": "Project Beta",
+            "sessionIds": [
+              "sess-alpha-plain",
+              "sess-beta-1"
+            ],
+            "createdAt": "2026-11-20T08:05:00.000Z",
+            "updatedAt": "2026-11-25T09:19:44.494Z"
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.387Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "localProjects",
+        "frame": {
+          "type": "localProjects",
+          "localProjects": [
+            {
+              "id": "proj-alpha",
+              "name": "Project Alpha",
+              "sessionIds": [
+                "sess-alpha-mobile",
+                "sess-alpha-active",
+                "sess-alpha-pinned",
+                "sess-alpha-archived"
+              ]
+            },
+            {
+              "id": "proj-beta",
+              "name": "Project Beta",
+              "sessionIds": [
+                "sess-beta-1",
+                "sess-alpha-plain"
+              ]
+            },
+            {
+              "id": "proj-gamma",
+              "name": "Project Gamma",
+              "sessionIds": [
+                "sess-gamma-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.388Z",
+      "kind": "assertion",
+      "detail": {
+        "event": "authoritative-project-move-committed",
+        "sessionId": "sess-alpha-plain",
+        "fromProjectId": "proj-alpha",
+        "toProjectId": "proj-beta",
+        "sessionCwdUnchanged": "/synthetic/workspaces/project-alpha",
+        "threadSectionsUnchanged": [
+          {
+            "id": "sec-focus",
+            "name": "Focus",
+            "appearance": null,
+            "threadIds": [
+              "sess-alpha-active"
+            ]
+          }
+        ],
+        "pinnedSessionIdsUnchanged": [
+          "sess-alpha-pinned"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.453Z",
+      "kind": "assertion",
+      "detail": {
+        "viewport": "desktop",
+        "check": "authoritative-placement-and-invariants",
+        "movedSession": "sess-alpha-plain",
+        "landedIn": "Project Beta (ws-beta)",
+        "removedFromSource": "Project Alpha (ws-alpha)",
+        "cwdPreserved": true,
+        "sectionPreserved": true,
+        "pinPreserved": true
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.481Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase1/05-desktop-after-move.png",
+        "description": "Desktop sidebar after authoritative move to Project Beta"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.553Z",
+      "kind": "rpc",
+      "detail": {
+        "method": "workspace/moveSessionToProject",
+        "request": {
+          "sessionId": "sess-alpha-active",
+          "projectId": "proj-beta"
+        },
+        "keys": [
+          "projectId",
+          "sessionId"
+        ],
+        "delayMs": 0,
+        "willFail": false
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.553Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "upsert",
+        "frame": {
+          "type": "upsert",
+          "workspace": {
+            "workspaceId": "ws-alpha",
+            "path": "/synthetic/workspaces/project-alpha",
+            "title": "Project Alpha",
+            "sessionIds": [
+              "sess-alpha-mobile",
+              "sess-alpha-pinned",
+              "sess-alpha-child",
+              "sess-alpha-archived"
+            ],
+            "createdAt": "2026-11-20T08:00:00.000Z",
+            "updatedAt": "2026-11-25T09:19:45.494Z"
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.553Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "upsert",
+        "frame": {
+          "type": "upsert",
+          "workspace": {
+            "workspaceId": "ws-beta",
+            "path": "/synthetic/workspaces/project-beta",
+            "title": "Project Beta",
+            "sessionIds": [
+              "sess-alpha-active",
+              "sess-alpha-plain",
+              "sess-beta-1"
+            ],
+            "createdAt": "2026-11-20T08:05:00.000Z",
+            "updatedAt": "2026-11-25T09:19:46.494Z"
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.554Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "localProjects",
+        "frame": {
+          "type": "localProjects",
+          "localProjects": [
+            {
+              "id": "proj-alpha",
+              "name": "Project Alpha",
+              "sessionIds": [
+                "sess-alpha-mobile",
+                "sess-alpha-pinned",
+                "sess-alpha-archived"
+              ]
+            },
+            {
+              "id": "proj-beta",
+              "name": "Project Beta",
+              "sessionIds": [
+                "sess-beta-1",
+                "sess-alpha-plain",
+                "sess-alpha-active"
+              ]
+            },
+            {
+              "id": "proj-gamma",
+              "name": "Project Gamma",
+              "sessionIds": [
+                "sess-gamma-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.554Z",
+      "kind": "assertion",
+      "detail": {
+        "event": "authoritative-project-move-committed",
+        "sessionId": "sess-alpha-active",
+        "fromProjectId": "proj-alpha",
+        "toProjectId": "proj-beta",
+        "sessionCwdUnchanged": "/synthetic/workspaces/project-alpha",
+        "threadSectionsUnchanged": [
+          {
+            "id": "sec-focus",
+            "name": "Focus",
+            "appearance": null,
+            "threadIds": [
+              "sess-alpha-active"
+            ]
+          }
+        ],
+        "pinnedSessionIdsUnchanged": [
+          "sess-alpha-pinned"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:44.639Z",
+      "kind": "assertion",
+      "detail": {
+        "viewport": "desktop",
+        "check": "sectioned-session-move-preserves-section",
+        "movedSession": "sess-alpha-active",
+        "toProjectId": "proj-beta",
+        "sectionUnchanged": "sec-focus"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:45.322Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "baseline"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:46.721Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase1/06-mobile-360-menu.png",
+        "description": "360px mobile sidebar menu showing 移动到项目 before 移动到分区"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:46.794Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase1/07-mobile-360-dialog.png",
+        "description": "360px mobile MoveThreadProjectDialog rendered in PhoneSidebarView"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:46.830Z",
+      "kind": "rpc",
+      "detail": {
+        "method": "workspace/moveSessionToProject",
+        "request": {
+          "sessionId": "sess-alpha-mobile",
+          "projectId": "proj-beta"
+        },
+        "keys": [
+          "projectId",
+          "sessionId"
+        ],
+        "delayMs": 0,
+        "willFail": false
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:46.830Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "upsert",
+        "frame": {
+          "type": "upsert",
+          "workspace": {
+            "workspaceId": "ws-alpha",
+            "path": "/synthetic/workspaces/project-alpha",
+            "title": "Project Alpha",
+            "sessionIds": [
+              "sess-alpha-pinned",
+              "sess-alpha-child",
+              "sess-alpha-archived"
+            ],
+            "createdAt": "2026-11-20T08:00:00.000Z",
+            "updatedAt": "2026-11-25T09:19:47.494Z"
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:46.830Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "upsert",
+        "frame": {
+          "type": "upsert",
+          "workspace": {
+            "workspaceId": "ws-beta",
+            "path": "/synthetic/workspaces/project-beta",
+            "title": "Project Beta",
+            "sessionIds": [
+              "sess-alpha-mobile",
+              "sess-alpha-active",
+              "sess-alpha-plain",
+              "sess-beta-1"
+            ],
+            "createdAt": "2026-11-20T08:05:00.000Z",
+            "updatedAt": "2026-11-25T09:19:48.494Z"
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:46.830Z",
+      "kind": "stream",
+      "detail": {
+        "endpoint": "workspace/follow",
+        "type": "localProjects",
+        "frame": {
+          "type": "localProjects",
+          "localProjects": [
+            {
+              "id": "proj-alpha",
+              "name": "Project Alpha",
+              "sessionIds": [
+                "sess-alpha-pinned",
+                "sess-alpha-archived"
+              ]
+            },
+            {
+              "id": "proj-beta",
+              "name": "Project Beta",
+              "sessionIds": [
+                "sess-beta-1",
+                "sess-alpha-plain",
+                "sess-alpha-active",
+                "sess-alpha-mobile"
+              ]
+            },
+            {
+              "id": "proj-gamma",
+              "name": "Project Gamma",
+              "sessionIds": [
+                "sess-gamma-1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:46.830Z",
+      "kind": "assertion",
+      "detail": {
+        "event": "authoritative-project-move-committed",
+        "sessionId": "sess-alpha-mobile",
+        "fromProjectId": "proj-alpha",
+        "toProjectId": "proj-beta",
+        "sessionCwdUnchanged": "/synthetic/workspaces/project-alpha",
+        "threadSectionsUnchanged": [
+          {
+            "id": "sec-focus",
+            "name": "Focus",
+            "appearance": null,
+            "threadIds": [
+              "sess-alpha-active"
+            ]
+          }
+        ],
+        "pinnedSessionIdsUnchanged": [
+          "sess-alpha-pinned"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:46.930Z",
+      "kind": "assertion",
+      "detail": {
+        "viewport": "mobile-360",
+        "check": "phone-sidebar-view-move-and-placement",
+        "movedSession": "sess-alpha-mobile",
+        "renderedInPhoneSidebarView": true,
+        "landedIn": "Project Beta (ws-beta)",
+        "removedFromSource": "Project Alpha (ws-alpha)",
+        "pinPreserved": true
+      }
+    },
+    {
+      "timestamp": "2026-11-25T09:19:46.966Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase1/08-mobile-360-after-move.png",
+        "description": "360px mobile sidebar after authoritative move to Project Beta"
+      }
+    }
+  ]
+}

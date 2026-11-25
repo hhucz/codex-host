@@ -1,0 +1,267 @@
+{
+  "hasLocalShell": false,
+  "projectMoves": [
+    {
+      "sessionId": "sess-alpha-1",
+      "projectId": "proj-gamma",
+      "outcome": "confirmed"
+    },
+    {
+      "sessionId": "sess-alpha-2",
+      "projectId": "proj-beta",
+      "outcome": "confirmed"
+    },
+    {
+      "sessionId": "sess-recents-1",
+      "projectId": "proj-beta",
+      "outcome": "confirmed"
+    },
+    {
+      "sessionId": "sess-alpha-1",
+      "projectId": "proj-alpha",
+      "outcome": "unknown"
+    }
+  ],
+  "sectionMoves": [],
+  "operationLog": [
+    {
+      "timestamp": "2026-11-25T10:12:10.334Z",
+      "kind": "assertion",
+      "detail": {
+        "check": "drag-project-to-empty-header-highlight",
+        "highlighted": [
+          "d29d7eed-99b8-43c8-9440-c4b8c9c93fce"
+        ],
+        "blueLines": 0
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:10.368Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase2/01-desktop-drag-project-to-header-highlight.png",
+        "description": "Cross-project drag hovering empty native project header: container highlighted, no blue reorder line"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:10.377Z",
+      "kind": "assertion",
+      "detail": {
+        "check": "drag-drop-row-pending-feedback",
+        "sessionId": "sess-alpha-1",
+        "ariaBusy": true
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:10.409Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase2/02-desktop-drag-pending-row.png",
+        "description": "In-flight row pending indicator during cross-project move"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:11.285Z",
+      "kind": "rpc",
+      "detail": {
+        "method": "workspace/moveSessionToProject",
+        "request": {
+          "sessionId": "sess-alpha-1",
+          "projectId": "proj-gamma"
+        },
+        "result": {
+          "status": "confirmed",
+          "projectId": "proj-gamma"
+        },
+        "sessionCwdPreserved": "/synthetic/temp/codexhost-project-dnd-verify/proj-alpha",
+        "threadSectionsPreserved": [
+          {
+            "id": "sec-focus",
+            "name": "Focus",
+            "appearance": null,
+            "threadIds": [
+              "sess-alpha-sectioned"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:11.802Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase2/03-desktop-after-project-move.png",
+        "description": "Authoritative placement of Alpha API Migration inside Empty Project Gamma"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:11.808Z",
+      "kind": "assertion",
+      "detail": {
+        "check": "drag-project-to-session-area-highlight",
+        "highlighted": [
+          "d3e88796-59ae-4576-87f1-ae114a2cb75b"
+        ],
+        "blueLines": 0
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:11.852Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase2/04-desktop-drag-to-session-area-highlight.png",
+        "description": "Cross-project drag hovering target project's own session area: container highlighted, no blue reorder line"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:11.855Z",
+      "kind": "rpc",
+      "detail": {
+        "method": "workspace/moveSessionToProject",
+        "request": {
+          "sessionId": "sess-alpha-2",
+          "projectId": "proj-beta"
+        },
+        "result": {
+          "status": "confirmed",
+          "projectId": "proj-beta"
+        },
+        "sessionCwdPreserved": "/synthetic/temp/codexhost-project-dnd-verify/proj-alpha",
+        "threadSectionsPreserved": [
+          {
+            "id": "sec-focus",
+            "name": "Focus",
+            "appearance": null,
+            "threadIds": [
+              "sess-alpha-sectioned"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:11.893Z",
+      "kind": "assertion",
+      "detail": {
+        "check": "drag-recents-to-project-highlight",
+        "highlighted": [
+          "d3e88796-59ae-4576-87f1-ae114a2cb75b"
+        ],
+        "blueLines": 0
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:11.931Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase2/05-desktop-drag-recents-to-project.png",
+        "description": "Dragging Recents session onto Project Beta highlights project container with no blue line"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:11.934Z",
+      "kind": "rpc",
+      "detail": {
+        "method": "workspace/moveSessionToProject",
+        "request": {
+          "sessionId": "sess-recents-1",
+          "projectId": "proj-beta"
+        },
+        "result": {
+          "status": "confirmed",
+          "projectId": "proj-beta"
+        },
+        "sessionCwdPreserved": "/synthetic/temp/codexhost-project-dnd-verify/scratch-loose",
+        "threadSectionsPreserved": [
+          {
+            "id": "sec-focus",
+            "name": "Focus",
+            "appearance": null,
+            "threadIds": [
+              "sess-alpha-sectioned"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:11.953Z",
+      "kind": "assertion",
+      "detail": {
+        "check": "same-project-manual-reorder-blue-line",
+        "highlighted": [],
+        "blueLines": 1
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:12.047Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase2/06-desktop-same-project-reorder-blue-line.png",
+        "description": "Same-project drag keeps blue reorder line with no project container highlight"
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:12.059Z",
+      "kind": "assertion",
+      "detail": {
+        "check": "custom-section-source-excludes-project-dnd",
+        "projectMovesCount": 3
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:12.065Z",
+      "kind": "assertion",
+      "detail": {
+        "check": "recents-not-drop-target",
+        "accepted": false
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:12.071Z",
+      "kind": "assertion",
+      "detail": {
+        "check": "non-native-web-workspace-not-drop-target",
+        "accepted": false
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:12.077Z",
+      "kind": "assertion",
+      "detail": {
+        "check": "composer-copy-no-commit",
+        "projectMovesCount": 3
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:12.104Z",
+      "kind": "assertion",
+      "detail": {
+        "check": "escape-blur-outside-cancel-no-commit",
+        "projectMovesCount": 3
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:12.109Z",
+      "kind": "rpc",
+      "detail": {
+        "method": "workspace/moveSessionToProject",
+        "request": {
+          "sessionId": "sess-alpha-1",
+          "projectId": "proj-alpha"
+        },
+        "result": {
+          "status": "unknown"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-11-25T10:12:12.367Z",
+      "kind": "screenshot",
+      "detail": {
+        "file": "phase2/07-desktop-dnd-unknown-toast.png",
+        "description": "Unknown outcome toast shown on cross-project DnD without auto-retry"
+      }
+    }
+  ]
+}

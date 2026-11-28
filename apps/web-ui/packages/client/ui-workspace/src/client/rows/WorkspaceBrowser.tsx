@@ -2231,33 +2231,47 @@ function WorkspaceBrowserContent({
       (remoteSearch.query === normalizedQuery && remoteSearch.status !== "loading"));
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollPositions = useRef<Map<string, number>>();
-  const restoredScroll = useRef<{ key: string; node: HTMLDivElement } | null>(null);
+  const scrollState = useRef<{ key: string; node: HTMLDivElement; pending: boolean } | null>(null);
 
   useLayoutEffect(() => {
     const node = scrollRef.current;
     if (!wide || node === null) {
-      restoredScroll.current = null;
+      scrollState.current = null;
       return;
     }
-    const restored = restoredScroll.current;
-    if (restored?.key === scrollKey && restored.node === node) return;
-    restoredScroll.current = null;
-    const top = scrollPositions.current?.get(scrollKey) ?? 0;
-    if (!scrollReady && top !== 0 && revealSessionId === undefined) {
-      if (restored?.node === node) node.scrollTop = 0;
-      return;
+    let state = scrollState.current;
+    if (state?.key !== scrollKey || state.node !== node) {
+      if (state?.node === node && revealSessionId === undefined) node.scrollTop = 0;
+      state = { key: scrollKey, node, pending: true };
+      scrollState.current = state;
     }
-    restoredScroll.current = { key: scrollKey, node };
+    if (!state.pending) return;
     // A pending row reveal owns the scroll position, even if it must wait for its row.
-    if (revealSessionId === undefined) node.scrollTop = top;
-  }, [wide, scrollKey, scrollReady, revealSessionId]);
+    if (revealSessionId === undefined) {
+      const currentTop = node.scrollTop;
+      if (currentTop !== 0) {
+        // The user can scroll before the corresponding scroll event is dispatched.
+        (scrollPositions.current ??= new Map()).set(scrollKey, currentTop);
+      } else {
+        const top = scrollPositions.current?.get(scrollKey) ?? 0;
+        // Keep trying on commits while the projection cannot fit the saved offset.
+        if (top !== 0) {
+          if (!scrollReady || top - (node.scrollHeight - node.clientHeight) >= 1) return;
+          node.scrollTop = top;
+        }
+      }
+    }
+    state.pending = false;
+  });
 
   const onScroll: UIEventHandler<HTMLDivElement> = ({ currentTarget: node }) => {
-    if (!wide || restoredScroll.current?.key !== scrollKey || restoredScroll.current.node !== node)
-      return;
+    const state = scrollState.current;
+    if (!wide || state?.key !== scrollKey || state.node !== node) return;
     const top = node.scrollTop;
     // A temporary empty projection can clamp the scroll offset without user input.
-    if (top === 0 && (!scrollReady || node.scrollHeight <= node.clientHeight)) return;
+    if (top === 0 && (state.pending || !scrollReady || node.scrollHeight <= node.clientHeight))
+      return;
+    state.pending = false;
     (scrollPositions.current ??= new Map()).set(scrollKey, top);
   };
   const scrollBinding = { scrollRef, onScroll };

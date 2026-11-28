@@ -11,6 +11,20 @@ let host: HTMLDivElement;
 
 beforeEach(() => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  const setScrollTop = Object.getOwnPropertyDescriptor(Element.prototype, "scrollTop")!.set!;
+  vi.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(100);
+  vi.spyOn(Element.prototype, "scrollHeight", "get").mockImplementation(function (this: Element) {
+    const rows = this.querySelectorAll(
+      '[data-row-key^="session:"], [data-row-key^="recent:"], [aria-label="search.results.aria"] [role="treeitem"]',
+    );
+    return 100 + rows.length * 40;
+  });
+  vi.spyOn(Element.prototype, "scrollTop", "set").mockImplementation(function (
+    this: Element,
+    top: number,
+  ) {
+    setScrollTop.call(this, Math.max(0, Math.min(top, this.scrollHeight - this.clientHeight)));
+  });
   host = document.createElement("div");
   document.body.append(host);
   root = createRoot(host);
@@ -19,6 +33,7 @@ beforeEach(() => {
 afterEach(() => {
   act(() => root.unmount());
   host.remove();
+  vi.restoreAllMocks();
   vi.useRealTimers();
   vi.unstubAllGlobals();
 });
@@ -184,4 +199,29 @@ it("keeps activity, search queries, and each ordered view in separate scroll his
   fixture.model.view.orderBy = "updated";
   render(fixture);
   expect(element('[role="tree"]').scrollTop).toBe(260);
+});
+
+it.each([0, 45])("waits for activity rows unless the user scrolls (%i)", (userTop) => {
+  const fixture = sidebarFixture("flat");
+  const active = new Map(
+    fixture.model.list.ids.map((id) => [
+      id,
+      { running: true, pendingInteraction: undefined, completionUnread: false },
+    ]),
+  );
+  fixture.model.statuses = active;
+  render(fixture);
+  click('button[aria-label="activityView.label"]');
+  const activityTree = () => element('[aria-label="activityView.label"][role="tree"]');
+  scroll(activityTree(), 200);
+  render(fixture, false);
+
+  fixture.model.statuses = userTop === 0 ? new Map() : new Map([...active].slice(0, 2));
+  render(fixture);
+  expect(activityTree().scrollTop).toBe(0);
+  if (userTop !== 0) scroll(activityTree(), userTop);
+  fixture.model.statuses = active;
+  render(fixture);
+
+  expect(activityTree().scrollTop).toBe(userTop || 200);
 });

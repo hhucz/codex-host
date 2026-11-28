@@ -23,7 +23,10 @@ import {
 import {
   type ComponentProps,
   type CSSProperties,
+  type Dispatch,
   type ReactNode,
+  type SetStateAction,
+  type UIEventHandler,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -364,6 +367,8 @@ function workspaceGroupHalf(e: {
   return e.clientY < rect.top + rect.height / 2 ? "before" : "after";
 }
 
+type ScrollBinding = Required<Pick<ComponentProps<typeof AnimatedRows>, "scrollRef" | "onScroll">>;
+
 type SessionTreeProps = Pick<
   WorkspaceBrowserProps,
   | "useSessionStatus"
@@ -382,7 +387,8 @@ type SessionTreeProps = Pick<
     | "sidebar.session.row.identity"
     | "sidebar.session.row.leading"
     | "sidebar.session.row.hover"
-  > & {
+  > &
+  ScrollBinding & {
     shortcuts: readonly ShortcutCatalogEntry[];
     /** Always-mounted Session list snapshot. */
     list: SessionListState;
@@ -401,6 +407,10 @@ type SessionTreeProps = Pick<
     canStartProjectless: boolean;
     /** Grouping, ordering, and filter changes replace the view without row motion. */
     animationResetKey: string;
+    sessionLimits: Readonly<Record<string, number>>;
+    setSessionLimits: Dispatch<SetStateAction<Readonly<Record<string, number>>>>;
+    allWorkspacesShown: boolean;
+    setAllWorkspacesShown: (shown: boolean) => void;
     /** Nest Workspaces under their nearest registered ancestors. */
     nestWorkspaces: boolean;
     /** Explicit persisted group expansion, including descendants in tree mode. */
@@ -468,7 +478,7 @@ function EmptySessions({
   );
 }
 
-/** The scrolling session tree; unmounting drops the sessions subscription and local row limits. */
+/** The wide-only scrolling session tree. */
 function SessionTree({
   list,
   useSessionStatus,
@@ -484,6 +494,12 @@ function SessionTree({
   workspaceReady,
   canStartProjectless,
   animationResetKey,
+  scrollRef,
+  onScroll,
+  sessionLimits,
+  setSessionLimits,
+  allWorkspacesShown,
+  setAllWorkspacesShown,
   usePanelInfo,
   onRenameRequest,
   onDeleteRequest,
@@ -531,7 +547,6 @@ function SessionTree({
     revealSessionId === undefined || !workspaceReady
       ? undefined
       : owningGroupKey(ownWorkspaces, threadView.rootId(revealSessionId));
-  const [sessionLimits, setSessionLimits] = useState<Readonly<Record<string, number>>>({});
   // Transient drag marker state; the selected mode owns the resulting order.
   const [drag, setDrag] = useState<DragState | null>(null);
   const sessionDropCommitted = useRef(false);
@@ -748,7 +763,6 @@ function SessionTree({
     }
     return keys;
   }, [currentGroup, revealGroup, rootKeyOf]);
-  const [allWorkspacesShown, setAllWorkspacesShown] = useState(false);
   const { pinnedGroups, sectionRoots, workspaceRoots } = useMemo(
     () => partitionRootWorkspaceGroups(rootGroups, nativeSections, pinnedWorkspaceIds, sectionOf),
     [nativeSections, pinnedWorkspaceIds, rootGroups, sectionOf],
@@ -1188,9 +1202,7 @@ function SessionTree({
           type="button"
           className={css.sessionOverflowButton}
           data-row-key="overflow:workspaces"
-          onClick={() => {
-            setAllWorkspacesShown(true);
-          }}
+          onClick={() => setAllWorkspacesShown(true)}
         >
           {t("workspaces.expand")}
         </button>,
@@ -1206,6 +1218,8 @@ function SessionTree({
         className={clsx(css.list, workspaceDropAtListStart && css.listTopDropActive)}
         label={t("section.sessions")}
         rowKeys={rowKeys}
+        scrollRef={scrollRef}
+        onScroll={onScroll}
         ready={list.phase === "ready" && workspaceReady && !nativeDragActive}
         resetKey={JSON.stringify([
           animationResetKey,
@@ -1376,6 +1390,10 @@ function FlatList({
   setSectionExpanded,
   workspaceReady,
   animationResetKey,
+  scrollRef,
+  onScroll,
+  limit,
+  setLimit,
   revealSessionId,
   onSessionRevealed,
   renderSlot,
@@ -1406,10 +1424,13 @@ function FlatList({
   | "singleRemoteHostScoped"
   | "onResetHostScope"
   | "t"
-> & {
-  list: SessionListState;
-  sessionIds: readonly SessionId[];
-}) {
+> &
+  ScrollBinding & {
+    list: SessionListState;
+    sessionIds: readonly SessionId[];
+    limit: number;
+    setLimit: (limit: number) => void;
+  }) {
   const panelActive = usePanelInfo((info) => info.activePanelId !== null);
   const statuses = useSessionStatus((s) => s);
   const threadView = useThreadTreeView();
@@ -1433,7 +1454,6 @@ function FlatList({
   );
   const [drag, setDrag] = useState<DragState | null>(null);
   const dropCommitted = useRef(false);
-  const [limit, setLimit] = useState(SIDEBAR_PAGE_ROWS);
   useNativeDragAcceptance(drag !== null);
   const currentId = panelActive
     ? undefined
@@ -1460,6 +1480,8 @@ function FlatList({
       <AnimatedRows
         className={clsx(css.list, css.flatList)}
         label={t("section.sessions")}
+        scrollRef={scrollRef}
+        onScroll={onScroll}
         rowKeys={[
           ...(pinnedRows.length === 0 ? [] : [`section:${PINNED_SECTION_KEY}`]),
           ...(pinnedSectionExpanded
@@ -1621,21 +1643,21 @@ function SearchResults({
   remote,
   resultLimit,
   usePanelInfo,
+  scrollRef,
+  onScroll,
   t,
-}: Pick<
-  WorkspaceBrowserProps,
-  "useSessions" | "useSessionStatus" | "open" | "t" | "usePanelInfo"
-> & {
-  workspaces: readonly WorkspaceView[];
-  archivedSessionIds: readonly SessionNode["id"][];
-  /** Search matches follow the archived filter selected for the list. */
-  archivedFilter: ArchivedFilter;
-  /** Unarchive an archived result row in place. */
-  onUnarchive: (id: SessionNode["id"]) => void;
-  query: string;
-  remote: RemoteSearchState;
-  resultLimit: number;
-}) {
+}: Pick<WorkspaceBrowserProps, "useSessions" | "useSessionStatus" | "open" | "t" | "usePanelInfo"> &
+  ScrollBinding & {
+    workspaces: readonly WorkspaceView[];
+    archivedSessionIds: readonly SessionNode["id"][];
+    /** Search matches follow the archived filter selected for the list. */
+    archivedFilter: ArchivedFilter;
+    /** Unarchive an archived result row in place. */
+    onUnarchive: (id: SessionNode["id"]) => void;
+    query: string;
+    remote: RemoteSearchState;
+    resultLimit: number;
+  }) {
   const panelActive = usePanelInfo((info) => info.activePanelId !== null);
   const list = useSessions((s) => s);
   const statuses = useSessionStatus((s) => s);
@@ -1673,7 +1695,7 @@ function SearchResults({
 
   return (
     <div className={clsx(css.treeBody, css.wide)}>
-      <div className={css.list}>
+      <div className={css.list} ref={scrollRef} onScroll={onScroll}>
         <div className={css.searchTree} role="tree" aria-label={t("search.results.aria")}>
           {results.items.map((result) => (
             <SearchResultItem
@@ -2005,6 +2027,9 @@ function WorkspaceBrowserContent({
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [activityViewOpen, setActivityViewOpen] = useState(false);
   const [revealSessionId, setRevealSessionId] = useState<SessionId | undefined>(undefined);
+  const [sessionLimits, setSessionLimits] = useState<Readonly<Record<string, number>>>({});
+  const [allWorkspacesShown, setAllWorkspacesShown] = useState(false);
+  const [flatLimit, setFlatLimit] = useState(SIDEBAR_PAGE_ROWS);
   const normalizedQuery = sanitizeSearchQuery(query).trim();
   const [remoteSearch, setRemoteSearch] = useState<RemoteSearchState>({
     query: "",
@@ -2194,6 +2219,48 @@ function WorkspaceBrowserContent({
     () => (hostScopeFiltered ? JSON.stringify(effectiveHostScopeFilter) : "all"),
     [hostScopeFiltered, effectiveHostScopeFilter],
   );
+  const animationResetKey = `${groupBy}/${orderBy}/${archivedFilter}/${hostScopeResetKey}`;
+  const scrollKey =
+    normalizedQuery !== ""
+      ? `search/${animationResetKey}/${normalizedQuery}`
+      : `${activityViewOpen ? "activity" : groupBy === "flat" ? "flat" : "tree"}/${animationResetKey}`;
+  const scrollReady =
+    list.phase === "ready" &&
+    workspaceReady &&
+    (normalizedQuery === "" ||
+      (remoteSearch.query === normalizedQuery && remoteSearch.status !== "loading"));
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollPositions = useRef<Map<string, number>>();
+  const restoredScroll = useRef<{ key: string; node: HTMLDivElement } | null>(null);
+
+  useLayoutEffect(() => {
+    const node = scrollRef.current;
+    if (!wide || node === null) {
+      restoredScroll.current = null;
+      return;
+    }
+    const restored = restoredScroll.current;
+    if (restored?.key === scrollKey && restored.node === node) return;
+    restoredScroll.current = null;
+    const top = scrollPositions.current?.get(scrollKey) ?? 0;
+    if (!scrollReady && top !== 0 && revealSessionId === undefined) {
+      if (restored?.node === node) node.scrollTop = 0;
+      return;
+    }
+    restoredScroll.current = { key: scrollKey, node };
+    // A pending row reveal owns the scroll position, even if it must wait for its row.
+    if (revealSessionId === undefined) node.scrollTop = top;
+  }, [wide, scrollKey, scrollReady, revealSessionId]);
+
+  const onScroll: UIEventHandler<HTMLDivElement> = ({ currentTarget: node }) => {
+    if (!wide || restoredScroll.current?.key !== scrollKey || restoredScroll.current.node !== node)
+      return;
+    const top = node.scrollTop;
+    // A temporary empty projection can clamp the scroll offset without user input.
+    if (top === 0 && (!scrollReady || node.scrollHeight <= node.clientHeight)) return;
+    (scrollPositions.current ??= new Map()).set(scrollKey, top);
+  };
+  const scrollBinding = { scrollRef, onScroll };
   const activityProjection = useMemo(
     () => deriveActivityView(scopedList, rowState, statuses),
     [scopedList, rowState, statuses],
@@ -2253,6 +2320,10 @@ function WorkspaceBrowserContent({
     open(sessionId);
   };
   const acknowledgeSessionReveal = (sessionId: SessionId): void => {
+    const node = scrollRef.current;
+    if (sessionId === revealSessionId && node !== null) {
+      (scrollPositions.current ??= new Map()).set(scrollKey, node.scrollTop);
+    }
     setRevealSessionId((current) => (current === sessionId ? undefined : current));
   };
   useEffect(() => {
@@ -2753,6 +2824,7 @@ function WorkspaceBrowserContent({
         {wide &&
           (normalizedQuery !== "" ? (
             <SearchResults
+              {...scrollBinding}
               usePanelInfo={usePanelInfo}
               useSessions={useSessions}
               useSessionStatus={useSessionStatus}
@@ -2768,6 +2840,7 @@ function WorkspaceBrowserContent({
             />
           ) : activityViewOpen ? (
             <ActivityViewList
+              {...scrollBinding}
               projection={activityProjection}
               currentId={activityCurrentId}
               ready={list.phase === "ready" && workspaceReady}
@@ -2784,6 +2857,9 @@ function WorkspaceBrowserContent({
             />
           ) : groupBy === "flat" ? (
             <FlatList
+              {...scrollBinding}
+              limit={flatLimit}
+              setLimit={setFlatLimit}
               loadMoreSessions={loadMoreSessions}
               usePanelInfo={usePanelInfo}
               list={scopedList}
@@ -2792,7 +2868,7 @@ function WorkspaceBrowserContent({
               nativeSections={nativeSections}
               onLeaveArchivedOnly={leaveArchivedOnly}
               workspaceReady={workspaceReady}
-              animationResetKey={`${groupBy}/${orderBy}/${archivedFilter}/${hostScopeResetKey}`}
+              animationResetKey={animationResetKey}
               useSessionStatus={useSessionStatus}
               open={guardedOpen}
               onSessionRenameRequest={requestSessionRename}
@@ -2809,6 +2885,11 @@ function WorkspaceBrowserContent({
             />
           ) : (
             <SessionTree
+              {...scrollBinding}
+              sessionLimits={sessionLimits}
+              setSessionLimits={setSessionLimits}
+              allWorkspacesShown={allWorkspacesShown}
+              setAllWorkspacesShown={setAllWorkspacesShown}
               loadMoreSessions={loadMoreSessions}
               usePanelInfo={usePanelInfo}
               list={scopedList}
@@ -2823,7 +2904,7 @@ function WorkspaceBrowserContent({
               canStartProjectless={scopedCanStartProjectless}
               workspaceReady={workspaceReady}
               nestWorkspaces={groupBy === "workspace-tree"}
-              animationResetKey={`${groupBy}/${orderBy}/${archivedFilter}/${hostScopeResetKey}`}
+              animationResetKey={animationResetKey}
               groupExpansion={groupExpansion}
               setGroupExpanded={actions.setGroupExpanded}
               sectionExpansion={sectionExpansion}

@@ -3,6 +3,7 @@
  * sessions with a compact header bar for one-click "Mark all read".
  */
 import clsx from "clsx";
+import type { ComponentProps } from "react";
 import type { PropsRenderSlots } from "@deepseek-ai/dsh-client-ui-slots";
 import type { SessionId } from "@deepseek-ai/dsh-session/types";
 import type { WorkspaceBrowserProps } from "../contract/slots.ts";
@@ -42,13 +43,16 @@ export function ActivityFilterIcon({
   );
 }
 
-export interface ActivityViewListProps extends PropsRenderSlots<
-  | "sidebar.workspaces.session.menu.item"
-  | "sidebar.workspaces.session.row.action"
-  | "sidebar.session.row.identity"
-  | "sidebar.session.row.leading"
-  | "sidebar.session.row.hover"
-> {
+export interface ActivityViewListProps
+  extends
+    PropsRenderSlots<
+      | "sidebar.workspaces.session.menu.item"
+      | "sidebar.workspaces.session.row.action"
+      | "sidebar.session.row.identity"
+      | "sidebar.session.row.leading"
+      | "sidebar.session.row.hover"
+    >,
+    Pick<ComponentProps<typeof AnimatedRows>, "scrollRef" | "onScroll"> {
   projection: ActivityViewProjection;
   currentId: SessionId | undefined;
   ready: boolean;
@@ -66,6 +70,8 @@ export function ActivityViewList({
   currentId,
   ready,
   animationResetKey,
+  scrollRef,
+  onScroll,
   singleRemoteHostScoped = false,
   onOpen,
   onSessionRenameRequest,
@@ -115,6 +121,8 @@ export function ActivityViewList({
         rowKeys={rowKeys}
         ready={ready}
         resetKey={animationResetKey}
+        scrollRef={scrollRef}
+        onScroll={onScroll}
       >
         {rows.length === 0 ? (
           <div className={css.emptyState} data-row-key="empty:activity">

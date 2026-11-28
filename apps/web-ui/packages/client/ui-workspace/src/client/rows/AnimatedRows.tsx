@@ -1,5 +1,5 @@
 /** React-commit-driven movement and entry/exit fades for the sidebar's keyed rows. */
-import { Component, createRef, type ReactNode } from "react";
+import { Component, createRef, type ReactNode, type RefObject, type UIEventHandler } from "react";
 import css from "./AnimatedRows.module.css";
 import { navigateSidebar, syncSidebarTabStop } from "./sidebar-keyboard.ts";
 
@@ -15,6 +15,8 @@ interface AnimatedRowsProps {
   ready: boolean;
   /** Changes that replace the view or reveal hidden rows settle immediately. */
   resetKey: string;
+  scrollRef?: RefObject<HTMLDivElement>;
+  onScroll?: UIEventHandler<HTMLDivElement>;
 }
 
 interface RowPosition {
@@ -51,10 +53,14 @@ function intersects(row: DOMRect, viewport: DOMRect): boolean {
  */
 export class AnimatedRows extends Component<AnimatedRowsProps> {
   private armed = false;
-  private readonly list = createRef<HTMLDivElement>();
+  private readonly localList = createRef<HTMLDivElement>();
   private readonly overlay = createRef<HTMLDivElement>();
   private readonly movements = new Map<HTMLElement, Animation>();
   private readonly exits = new Map<string, { element: HTMLElement; animation: Animation }>();
+
+  private get list(): RefObject<HTMLDivElement> {
+    return this.props.scrollRef ?? this.localList;
+  }
 
   override componentDidMount(): void {
     syncSidebarTabStop(this.list.current);
@@ -227,6 +233,7 @@ export class AnimatedRows extends Component<AnimatedRowsProps> {
           className={this.props.className}
           role="tree"
           aria-label={this.props.label}
+          onScroll={this.props.onScroll}
           onKeyDown={navigateSidebar}
           onFocusCapture={() => syncSidebarTabStop(this.list.current)}
           onPointerDownCapture={() => {

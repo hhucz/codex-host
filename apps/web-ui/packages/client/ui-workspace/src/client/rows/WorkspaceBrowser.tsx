@@ -2269,8 +2269,7 @@ function WorkspaceBrowserContent({
     if (!wide || state?.key !== scrollKey || state.node !== node) return;
     const top = node.scrollTop;
     // A temporary empty projection can clamp the scroll offset without user input.
-    if (top === 0 && (state.pending || !scrollReady || node.scrollHeight <= node.clientHeight))
-      return;
+    if (top === 0 && (state.pending || node.scrollHeight <= node.clientHeight)) return;
     state.pending = false;
     (scrollPositions.current ??= new Map()).set(scrollKey, top);
   };

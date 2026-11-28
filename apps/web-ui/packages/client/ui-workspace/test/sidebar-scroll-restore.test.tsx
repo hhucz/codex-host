@@ -201,6 +201,25 @@ it("keeps activity, search queries, and each ordered view in separate scroll his
   expect(element('[role="tree"]').scrollTop).toBe(260);
 });
 
+it("remembers scrolling to the top while remote search is pending", async () => {
+  vi.useFakeTimers();
+  const fixture = sidebarFixture("flat");
+  render(fixture);
+  search("session");
+  const results = element('[aria-label="search.results.aria"]');
+  const list = results.parentElement!;
+  expect(results.querySelectorAll('[role="treeitem"]')).toHaveLength(25);
+  expect(list.querySelector('[role="status"][aria-label="search.pending"]')).not.toBeNull();
+  scroll(list, 222);
+  scroll(list, 0);
+
+  render(fixture, false);
+  await act(() => vi.advanceTimersByTimeAsync(250));
+  render(fixture);
+
+  expect(element('[aria-label="search.results.aria"]').parentElement!.scrollTop).toBe(0);
+});
+
 it.each([0, 45])("waits for activity rows unless the user scrolls (%i)", (userTop) => {
   const fixture = sidebarFixture("flat");
   const active = new Map(

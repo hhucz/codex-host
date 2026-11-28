@@ -214,6 +214,19 @@
 
 :global(html:is(:not([data-platform="darwin"]), [data-tauri-shell]) body[data-codexhost-wallpaper])
   .sidebarCol {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+/* Keep the blur off the column so fixed Windows caption controls stay viewport-relative. */
+:global(html:is(:not([data-platform="darwin"]), [data-tauri-shell]) body[data-codexhost-wallpaper])
+  .sidebarCol::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background: color-mix(in srgb, var(--dsw-specific-sidebar-fill) 22%, transparent);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
@@ -221,9 +234,9 @@
 
 :global(
     html:is(:not([data-platform="darwin"]), [data-tauri-shell])
-      body[data-ds-dark-theme][data-codexhost-wallpaper]
+      body:where([data-ds-dark-theme])[data-codexhost-wallpaper]
   )
-  .sidebarCol {
+  .sidebarCol::before {
   background: color-mix(in srgb, var(--dsw-specific-sidebar-fill) 26%, transparent);
 }
 
@@ -231,7 +244,7 @@
   :global(
       html:is(:not([data-platform="darwin"]), [data-tauri-shell]) body[data-codexhost-wallpaper]
     )
-    .sidebarCol {
+    .sidebarCol::before {
     background: color-mix(in srgb, var(--dsw-specific-sidebar-fill) 92%, transparent);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;

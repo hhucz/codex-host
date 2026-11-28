@@ -234,7 +234,7 @@
 
 :global(
     html:is(:not([data-platform="darwin"]), [data-tauri-shell])
-      body:where([data-ds-dark-theme])[data-codexhost-wallpaper]
+      body[data-ds-dark-theme][data-codexhost-wallpaper]
   )
   .sidebarCol::before {
   background: color-mix(in srgb, var(--dsw-specific-sidebar-fill) 26%, transparent);
